@@ -20,10 +20,29 @@ This method is currently the most widely used method in situations involving the
 The second step is to find a viable statistical method for ASE identification.
 The main methods includes:
 1. Binomial distribution test
-We assumed that there
+Here, we have totally 6 biological replicates. Each sample have maternal lineage for A group and paternal lineage for B group.   
+###python
+from statsmodels.stats.proportion import binom_test_reject_interval ## import the package
+gene_id = line_list[0]
+    gene_name = line_list[1]
+    chr_num = line_list[2]
+    MAT1, PAT1, MAT2, PAT2, MAT3, PAT3, MAT4, PAT4, MAT5, PAT5, MAT6, PAT6 = line_list[3], line_list[4], line_list[5], line_list[6], \
+                                                                              line_list[7], line_list[8], line_list[9], line_list[10], \
+                                                                              line_list[11], line_list[12], line_list[13], line_list[14]
+    data = [MAT1, PAT1, MAT2, PAT2, MAT3, PAT3, MAT4, PAT4, MAT5, PAT5, MAT6, PAT6] ## data[0:5] is A group, and data[6:14] is B group.
 
-2. Bayes test
+    p_value_list = []
+    for i in range(6):
+        p_value = binom_test(data[2*i], data[2*i] + data[2*i + 1], prop=0.5, alternative='two-sided') ## calculate the p-value one by one
+        p_value_list.append(p_value)
+    print(gene_id, gene_name, chr_num, sep='\t', end='\t')
+    for i in range(6):
+        print(data[2*i] / (data[2*i] + data[2*i + 1]), p_value_list[i], sep='\t', end='\t') ## output the maternal/paternal reads ratio and p-value.
+    print()
+###
+
+3. Bayes test
   
-3. Proportional distribution test
+4. Proportional distribution test
 This method has been used in Qllelic for ASE identification based on techinical replicates. You can refer to the following link. Noted that, Qllelic can also be used for biological replicates, however, the author dont recommend to do so.
-https://github.com/gimelbrantlab/Qllelic/issues
+https://github.com/gimelbrantlab/Qllelic
