@@ -23,6 +23,7 @@ The main methods includes:
 We assumed that there
 
 2. Bayes test
-Sorry, I know little about this method.
   
 3. Proportional distribution test
+This method has been used in Qllelic for ASE identification based on techinical replicates. You can refer to the following link. Noted that, Qllelic can also be used for biological replicates, however, the author dont recommend to do so.
+https://github.com/gimelbrantlab/Qllelic/issues
