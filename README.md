@@ -21,8 +21,9 @@ The second step is to find a viable statistical method for ASE identification.
 The main methods includes:
 1. Binomial distribution test
 Here, we have totally 6 biological replicates. Each sample have maternal lineage for A group and paternal lineage for B group.   
-###python
-from statsmodels.stats.proportion import binom_test_reject_interval ## import the package
+```python
+from statsmodels.stats.proportion import binom_test
+from statsmodels.stats.proportion import binom_test_reject_interval
 gene_id = line_list[0]
     gene_name = line_list[1]
     chr_num = line_list[2]
@@ -39,10 +40,37 @@ gene_id = line_list[0]
     for i in range(6):
         print(data[2*i] / (data[2*i] + data[2*i + 1]), p_value_list[i], sep='\t', end='\t') ## output the maternal/paternal reads ratio and p-value.
     print()
-###
+```
+Then, you can consider if each gene is ASE gene according to the p-value and ratio.
 
-3. Bayes test
+2. Bayes test
   
-4. Proportional distribution test
+3. Proportional distribution test
 This method has been used in Qllelic for ASE identification based on techinical replicates. You can refer to the following link. Noted that, Qllelic can also be used for biological replicates, however, the author dont recommend to do so.
 https://github.com/gimelbrantlab/Qllelic
+```python
+from statsmodels.stats.proportion import proportions_ztest
+from statsmodels.stats.proportion import proportion_confint
+def DeMA_judge2(line_list):
+    gene_id = line_list[0]
+    gene_name = line_list[1]
+    chr_num = line_list[2]
+    PAT1, MAT1, PAT2, MAT2, PAT3, MAT3, PAT4, MAT4, PAT5, MAT5, PAT6, MAT6 = line_list[3], line_list[4], line_list[5], line_list[6], \
+                                                                              line_list[7], line_list[8], line_list[9], line_list[10], \
+                                                                              line_list[11], line_list[12], line_list[13], line_list[14]
+    data = [PAT1, PAT2, PAT3, PAT4, PAT5, PAT6, MAT1, MAT2, MAT3, MAT4, MAT5, MAT6]
+    try:
+        int_list = [int(num) for num in data]
+        pats = sum(int_list[0: 5])
+        mats = sum(int_list[6: 11])
+        zstat1, p_value1 = proportions_ztest(pats, pats + mats, value=0.5, alternative='two-sided', prop_var=False)
+        p = pats / (pats + mats)
+        se = np.sqrt(p * (1 - p) / (pats + mats))
+        # zstat1, p_value1 = proportion_confint(pats, pats + mats, alpha=0.05, method='normal')
+        if (p - zstat1 * se - 0.5) * (p + zstat1 * se - 0.5) > 0:
+            print(gene_id, gene_name, chr_num, p, zstat1, se, p - zstat1 * se, p + zstat1 * se, p_value1, sep='\t') ## output the p-value and confidence interval based on Z test.
+    except ZeroDivisionError:
+        pass
+```
+In fact, I found the p-values calculated by propotional test were always small, while (upper_interval - 0.5)(lower_interval - 0.5) < 0 established for most genes. Their confidence interval crossed 0.5 and means that we cannot determine the propotion of one lineage is more or less than 0.5.
+However. when I used binom confidence interval instead, most genes can pass the confidence interval check. Undoubtly, This is unbelievable.
