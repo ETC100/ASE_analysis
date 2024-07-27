@@ -194,9 +194,16 @@ while line:
     count += 1
 ## python rearrange.py > data_rearrange.txt
 ```
-Okay, I don't recommond you to output the result to stdout. This is just an example.
+I don't really recommond you to output the result to stdout. This is just an example.
 ```
 ## run SNPsplit
 SNPsplit --bisulfite --snp_file data_rearrange.txt your_bam_file.bam -o path/to/output
 ## noticed that, don't add --paired or --single_end args, because your bam have both single and paired mapping results.
 ```
+What's more, we can call SNP using WGBS data.
+Bis-SNP: https://people.csail.mit.edu/dnaase/bissnp2011/  
+BS-SNPer: https://github.com/hellbelly/BS-Snper  
+When you only have breed specific SNP data with no NGS resequencing, and you want to get more SNP for phasing, then, WGBS-based SNP calling is used.
+Bis-SNP is quite hard to install, because the authors were no longer to maintain it. Use conda to install Bis-SNP firstly, and degrade the version of gatk to Bis-SNP required, nor Bis-SNP will report an error.
+There is also a pipeline for WGBS reads phasing and counting: https://github.com/BRL-BCM/allelic_epigenome.  
+This process is not strict with the reads phasing. As long as the corresponding position corresponds to the read information, it asign the read to maternal/paternal lineages, allowing reads with errors in other sites. This is different from SNPsplit. When you are in above situation 3, if the quality of your haploid genome is too poor, SNPsplit may not provide any useful output.
